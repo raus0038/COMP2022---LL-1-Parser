@@ -70,7 +70,7 @@ public class Parser implements Constants {
 			boolean parse_end = false;
 			int debugCounter = 0;
 			
-			while(parse_end == false) {
+			while(parse_end == false && debugCounter < 1000) {
 				
 			
 				print_stacks();
@@ -155,13 +155,17 @@ public class Parser implements Constants {
 					return newRule;
 				}
 				
-				if(terminal.compareTo("x") == 0) {
+				else if(terminal.compareTo("x") == 0 || terminal.compareTo("y") == 0 ) {
 					newRule.pop();
 					prev_rule_parts = save_rules(prev_rule_parts, newRule);
 					newRule = restore_rules(prev_rule_parts, newRule);
 					newRule.push("L");
 					newRule.push("A");
 					return newRule;
+				}
+				else {
+					System.out.println(terminal + " was found but expecting i or x or y");
+					newRule = null;
 				}
 			}
 		
@@ -295,7 +299,13 @@ public class Parser implements Constants {
 					newRule.pop();
 					prev_rule_parts = save_rules(prev_rule_parts, newRule);
 					newRule = restore_rules(prev_rule_parts, newRule);
-					
+					newRule.push("}");
+					newRule.push("S");
+					newRule.push("{");
+					newRule.push("e");
+					newRule.push("s");
+					newRule.push("l");
+					newRule.push("e");
 					return newRule;
 				}
 				else {
