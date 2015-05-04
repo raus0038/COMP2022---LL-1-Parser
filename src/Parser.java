@@ -76,6 +76,10 @@ public class Parser implements Constants {
 				print_stacks();
 		
 				String scanned = input.get(input.size() - 1);
+				String next_terminal = new String();
+				if(input.size() - 2 >= 0) {
+					next_terminal = input.get(input.size() - 2);
+				}
 				
 				if(scanned.compareTo(rules.get(rules.size() - 1)) == 0 && scanned.compareTo("$") == 0) {
 					parse_end = true;
@@ -87,7 +91,7 @@ public class Parser implements Constants {
 					input.pop();
 				}
 				
-			    rules = getRule(scanned, rules.get(rules.size() - 1), rules);
+			    rules = getRule(scanned, next_terminal, rules.get(rules.size() - 1), rules);
 			    
 			    if(rules == null) {
 			    	System.out.println("REJECTED");
@@ -119,7 +123,7 @@ public class Parser implements Constants {
 		}
 		
 		
-		public Stack<String> getRule(String terminal, String variable, Stack<String> prevRules) {
+		public Stack<String> getRule(String terminal, String next_terminal, String variable, Stack<String> prevRules) {
 			
 			Stack<String> newRule = prevRules;
 			ArrayList<String> prev_rule_parts = new ArrayList<String>();
@@ -136,7 +140,7 @@ public class Parser implements Constants {
 				return newRule;
 				
 			}
-			
+
 			if(terminal.compareTo("$") == 0 && checkTerminal(variable)) {
 				newRule = null;
 				System.out.println(terminal + " was not found ");
@@ -166,6 +170,7 @@ public class Parser implements Constants {
 				else {
 					System.out.println(terminal + " was found but expecting i or x or y");
 					newRule = null;
+					return newRule;
 				}
 			}
 		
@@ -186,6 +191,11 @@ public class Parser implements Constants {
 		
 					return newRule;
 				}
+				else {
+					System.out.println(terminal + " found but expected i");
+					newRule = null;
+					return newRule;
+				}
 			}
 			
 			if(variable.compareTo("C") == 0) {
@@ -196,6 +206,20 @@ public class Parser implements Constants {
 					newRule.push("Q");
 					newRule.push("O");
 					newRule.push("V");
+					return newRule;
+				}
+				else if (terminal.compareTo("a") == 0 || terminal.compareTo("b") == 0) {
+					newRule.pop();
+					prev_rule_parts = save_rules(prev_rule_parts, newRule);
+					newRule = restore_rules(prev_rule_parts, newRule);
+					newRule.push("Q");
+					newRule.push("O");
+					newRule.push("T");
+					return newRule;
+				}
+				else {
+					System.out.println(terminal + " found but expected x or y or a or b");
+					newRule = null;
 					return newRule;
 				}
 			}
@@ -215,6 +239,11 @@ public class Parser implements Constants {
 					newRule.push("y");
 					return newRule;
 				}
+				else {
+					System.out.println(terminal + " found but expected x or y");
+					newRule = null;
+					return newRule;
+				}
 			}
 			
 			if(variable.compareTo("T") == 0) {
@@ -230,6 +259,11 @@ public class Parser implements Constants {
 					prev_rule_parts = save_rules(prev_rule_parts, newRule);
 					newRule = restore_rules(prev_rule_parts, newRule);
 					newRule.push("b");
+					return newRule;
+				}
+				else {
+					System.out.println(terminal + " found but expected a or b");
+					newRule = null;
 					return newRule;
 				}
 			}
@@ -248,6 +282,11 @@ public class Parser implements Constants {
 					prev_rule_parts = save_rules(prev_rule_parts, newRule);
 					newRule = restore_rules(prev_rule_parts, newRule);
 					newRule.push(">");
+					return newRule;
+				}
+				else {
+					System.out.println(terminal + " found but expected > or <");
+					newRule = null;
 					return newRule;
 				}
 			}
@@ -275,6 +314,11 @@ public class Parser implements Constants {
 					newRule.push("V");
 					return newRule;
 				}
+				else {
+					System.out.println(terminal + " found but expected x or y");
+					newRule = null;
+					return newRule;
+				}
 				
 			}
 			
@@ -285,6 +329,12 @@ public class Parser implements Constants {
 					newRule = restore_rules(prev_rule_parts, newRule);
 					newRule.push("L");
 					newRule.push("A");
+					return newRule;
+				}
+				else if (newRule.get(newRule.size() - 2).compareTo("$") == 0 && terminal.compareTo("$") != 0 || 
+						checkTerminal(terminal) != true && terminal.compareTo("$") != 0) {
+					System.out.println(terminal + " found but expected null or x or y");
+					newRule = null;
 					return newRule;
 				}
 				else {
@@ -313,6 +363,14 @@ public class Parser implements Constants {
 					return newRule;
 				}
 				
+			}
+			
+			if(checkTerminal(terminal) && checkTerminal(next_terminal) && terminal.compareTo(next_terminal) == 0
+					&& terminal.compareTo("{") != 0 && terminal.compareTo("}") != 0 &&
+					terminal.compareTo("(") != 0 && terminal.compareTo(")") != 0 ) {
+				newRule = null;
+				System.out.println(terminal + " is duplicated");
+				return newRule;
 			}
 			
 			

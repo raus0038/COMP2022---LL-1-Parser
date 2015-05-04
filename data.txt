@@ -1,9 +1,17 @@
-if (x < a) {
+if(x > a)) {
   if (y > b) {
     x := a;
     y := b;
   }
   else {
   	y := a;
+  	y := a;
+  	y := a;
+
   }
+}
+else {
+	if(y > b) {
+		x := a;
+	}
 }
