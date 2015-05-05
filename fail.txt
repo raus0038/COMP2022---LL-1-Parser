@@ -1,3 +1,13 @@
 if (x < a) {
-    x := b
+    x := b;
+    y := a;
+}
+else {
+	y := b;
+	
+	else {
+	
+	x := b;
+	
+	}
 }

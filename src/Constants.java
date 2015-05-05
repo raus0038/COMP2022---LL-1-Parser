@@ -6,6 +6,4 @@ public interface Constants {
     String[] terminals = { "{", "}", ":", "=" , "x", "y", "a" ,"b", "(", ")", ";", "i", "f", "e", "l", "s", "e", "<", ">"};
     String[] variables = { "S", "L", "E", "R", "A", "T", "V", "C", "Q", "O" , "$" };
     
-    
- 
 }
