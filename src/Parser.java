@@ -142,15 +142,14 @@ public class Parser implements Constants {
 		
 		public Stack<String> getRule(String terminal, String next_terminal, String variable, Stack<String> prevRules) {
 			
-			
-			
 			Stack<String> temp_stack = variable_map.update_stack(variable, terminal, prevRules, error_found);
 			
 			if(error_recovery == true) {
 				if(temp_stack == null) {
-					print_stacks();
+					if(error_found == false) {
+						print_stacks();
+					}
 					input.pop();
-					
 					error_found = true;
 					rejected = true;
 				}

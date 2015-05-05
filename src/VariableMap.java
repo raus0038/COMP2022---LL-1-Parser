@@ -83,8 +83,10 @@ public class VariableMap implements Constants {
 						}
 						
 						if(valid_follow == 0) {
-							System.out.print(terminal + " was found but expected ");
-							current_variable.print_follow();
+							if(err == false) {
+								System.out.print(terminal + " was found but expected ");
+								current_variable.print_follow();
+							}
 							old_stack = null;
 						}
 						else {
