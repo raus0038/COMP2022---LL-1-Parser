@@ -90,6 +90,13 @@ public class Variable {
 		}
 	}
 	
+	public void print_follow() {
+		for(String value : follow) {
+			System.out.print( value + ", ");
+		}
+		System.out.println();
+	}
+	
 	public ArrayList<String> get_follow() {
 		return follow;
 	}

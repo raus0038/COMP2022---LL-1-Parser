@@ -13,6 +13,8 @@ public class Parser implements Constants {
 		Stack<String> input = new Stack<String>();
 		Stack<String> rules = new Stack<String>();
 		boolean error_recovery;
+		boolean error_found;
+		boolean rejected;
 		VariableMap variable_map;
 	
 		public Parser(String file, boolean err) {
@@ -20,6 +22,8 @@ public class Parser implements Constants {
 			variable_map = new VariableMap();
 			String unformatted_string = null;
 			error_recovery = err;
+			error_found = false;
+			rejected = false;
 			try {
 			  unformatted_string = readFile(file, Charset.defaultCharset() );
 			} catch (IOException e) {
@@ -78,31 +82,58 @@ public class Parser implements Constants {
 			
 			while(parse_end == false) {
 				
+				
+				
 				previous_stack = rules;
 				print_stacks();
 		
+				if(input.size() == 0) {
+					
+				}
 				String scanned = input.get(input.size() - 1);
 				String next_terminal = new String();
 				if(input.size() - 2 >= 0) {
 					next_terminal = input.get(input.size() - 2);
 				}
-				
-				if(scanned.compareTo(rules.get(rules.size() - 1)) == 0 && scanned.compareTo("$") == 0) {
-					parse_end = true;
-					System.out.println("ACCEPTED");
-					break;
-				}
-				
+
 				if(checkTerminal(rules.get(rules.size() - 1))) {
 					input.pop();
-				}
-				
+				}	
+			
 			    rules = getRule(scanned, next_terminal, rules.get(rules.size() - 1), rules);
-			    
-			    if(rules == null) {
-			    	System.out.println("REJECTED");
-			    	break;
+			    if(error_recovery == false) {
+			    	
+			    	if(rules == null) {
+				    	System.out.println("REJECTED");
+				    	break;
+				    }
+			    	
+				    if(scanned.compareTo(rules.get(rules.size() - 1)) == 0 && scanned.compareTo("$") == 0) {
+						parse_end = true;
+						System.out.println("ACCEPTED");
+						break;
+					}
+				    
+				    
 			    }
+			    else {
+			    	if(scanned.compareTo(rules.get(rules.size() - 1)) == 0 && scanned.compareTo("$") == 0 &&
+			    			rejected == false){
+			    		parse_end = true;
+						System.out.println("ACCEPTED");
+						break;
+			    	}
+			    	else if (scanned.compareTo(rules.get(rules.size() - 1)) == 0 && scanned.compareTo("$") == 0 ||
+			    			(input.size() == 0 && rules.size() > 0) | 	(input.size() > 0 && rules.size() == 0) &&
+			    			rejected == true) {
+			    		System.out.println("REJECTED");
+			    		parse_end = true;
+				    	break;
+			    	}
+			    }
+			    
+				
+				
 				debugCounter++;
 			}
 			
@@ -110,8 +141,28 @@ public class Parser implements Constants {
 				
 		
 		public Stack<String> getRule(String terminal, String next_terminal, String variable, Stack<String> prevRules) {
-				
-			prevRules = variable_map.update_stack(variable, terminal, prevRules);
+			
+			
+			
+			Stack<String> temp_stack = variable_map.update_stack(variable, terminal, prevRules, error_found);
+			
+			if(error_recovery == true) {
+				if(temp_stack == null) {
+					print_stacks();
+					input.pop();
+					
+					error_found = true;
+					rejected = true;
+				}
+				else {
+					error_found = false;
+					prevRules = temp_stack;
+				}
+			}
+			else {
+				prevRules = temp_stack;
+			}
+			
 			return prevRules;
 			
 		}

@@ -59,7 +59,7 @@ public class VariableMap implements Constants {
 		return false;
 	}
 	
-	public Stack<String> update_stack(String variable, String terminal, Stack<String> old_stack) {
+	public Stack<String> update_stack(String variable, String terminal, Stack<String> old_stack, boolean err) {
 		
 		boolean isTerminal = checkTerminal(variable);
 		
@@ -74,12 +74,30 @@ public class VariableMap implements Constants {
 			
 			if(rule == null) {
 					if(current_variable.get_follow().isEmpty() != true) {
-						old_stack.pop();
+						ArrayList<String> follow = current_variable.get_follow();
+						int valid_follow = 0;
+						for(String s : follow) {
+							if(s.compareTo(terminal) == 0) {
+								valid_follow++;
+							}
+						}
+						
+						if(valid_follow == 0) {
+							System.out.print(terminal + " was found but expected ");
+							current_variable.print_follow();
+							old_stack = null;
+						}
+						else {
+							old_stack.pop();
+						}
+						
 						return old_stack;
 					}
-					System.out.print(terminal + " was found but expected ");
-					current_variable.print_rules();
-					System.out.println();
+					if(err == false) {
+						System.out.print(terminal + " was found but expected ");
+						current_variable.print_rules();
+						System.out.println();
+					}
 					return null;
 			}
 			
@@ -93,7 +111,9 @@ public class VariableMap implements Constants {
 		}
 		else {
 			if(variable.compareTo(terminal) != 0) {
-				System.out.println(terminal + " was found but expected " + variable);
+				if(err == false) {
+					System.out.println(terminal + " was found but expected " + variable + ",");
+				}
 				return null;
 			}
 			else {
