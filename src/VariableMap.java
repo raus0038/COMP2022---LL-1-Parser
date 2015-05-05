@@ -76,7 +76,9 @@ public class VariableMap implements Constants {
 					if(current_variable.get_follow().isEmpty() != true) {
 						return update_stack_follow(current_variable, terminal, old_stack);
 					}
-					System.out.println(terminal + " was found but expected " + rule);
+					System.out.print(terminal + " was found but expected ");
+					current_variable.print_rules();
+					System.out.println();
 					return null;
 			}
 			

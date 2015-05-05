@@ -103,16 +103,6 @@ public class Parser implements Constants {
 			    	System.out.println("REJECTED");
 			    	break;
 			    }
-//			    else if (rules == null && error_recovery == true) {
-//			    	rules = previous_stack;
-//			    	rules.pop();
-//			    	if(input.get(input.size() - 1).compareTo("$") == 0 || rules.get(rules.size() - 1).compareTo("$") == 0) {
-//			    		parse_end = true;
-//			    		print_stacks();
-//			    		System.out.println("REJECTED");
-//			    	}
-//			    }
-		
 				debugCounter++;
 			}
 			

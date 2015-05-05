@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
 public class Variable {
@@ -26,16 +28,18 @@ public class Variable {
 		case "L":
 			  first.put("x", "AL");
 			  first.put("y", "AL");
-			  follow.add("$");
 			  follow.add("x");
 			  follow.add("y");
 			  follow.add("}");
+			  follow.add("$");
 			  break;
 		case "E":
 			  first.put("i", "if(C){S}R");
 			  break;
 		case "R":
 			  first.put("e", "else{S}");
+			  follow.add("x");
+			  follow.add("y");
 			  follow.add("$");
 			  break;
 		case "A":
@@ -74,6 +78,12 @@ public class Variable {
 	
 	public String get_rule(String terminal) {
 		return first.get(terminal);
+	}
+	
+	public void print_rules() {
+		for(String value : first.values()) {
+			System.out.print( value + ", ");
+		}
 	}
 	
 	public ArrayList<String> get_follow() {
