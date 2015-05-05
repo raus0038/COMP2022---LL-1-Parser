@@ -10,7 +10,7 @@ public class VariableMap implements Constants {
 		
 		variable_list = new ArrayList<Variable>();
 		
-		for(int i = 0; i < variable_number - 1; i++) {
+		for(int i = 0; i < variable_number; i++) {
 			variable_list.add(new Variable(variables[i]));
 		}
 	}
@@ -74,7 +74,8 @@ public class VariableMap implements Constants {
 			
 			if(rule == null) {
 					if(current_variable.get_follow().isEmpty() != true) {
-						return update_stack_follow(current_variable, terminal, old_stack);
+						old_stack.pop();
+						return old_stack;
 					}
 					System.out.print(terminal + " was found but expected ");
 					current_variable.print_rules();
@@ -101,27 +102,6 @@ public class VariableMap implements Constants {
 		}
 		
 		return old_stack;
-	}
-	
-	public Stack<String> update_stack_follow(Variable current, String terminal,  Stack<String> old_stack) {
-		
-		if(current.get_follow().isEmpty() == false) {
-			for(int i = 0; i < current.get_follow().size(); i++) {
-				if(current.get_follow().get(i).compareTo(terminal) == 0) {
-					old_stack.pop();
-					return old_stack;
-				}
-			}
-			
-			System.out.print(terminal + " was found but expected ");
-			for(String s : current.get_follow()) {
-				System.out.print(s + ", ");
-			}
-			System.out.println();
-			return null;
-		}
-		
-		return null;
 	}
 
 }

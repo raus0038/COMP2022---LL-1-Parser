@@ -40,6 +40,7 @@ public class Variable {
 			  first.put("e", "else{S}");
 			  follow.add("x");
 			  follow.add("y");
+			  follow.add("}");
 			  follow.add("$");
 			  break;
 		case "A":
@@ -69,6 +70,9 @@ public class Variable {
 		case "O":
 			  first.put(">", ">");
 			  first.put("<", "<");
+			  break;
+		case "$":
+			  first.put("$", "$");
 			  break;
 			  
 		
