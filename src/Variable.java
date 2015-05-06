@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.Stack;
 
 /*
  * Variable class to hold information regarding each individual variable of the 
@@ -102,12 +101,26 @@ public class Variable {
 		}
 	}
 	
-	public void print_follow() {
+	public void print_follow(Stack<String> stack) {
 		for(String value : follow) {
+			// Prints out the appropriate follow symbol, if the next rule on the stack is not '$'
+			// Then $ is not a valid follow symbol
+			// If the follow symbol is the end of the stack, then a '}' is not valid
+			if(stack.get(stack.size() - 2).compareTo("$") != 0 && value.compareTo("$") != 0 ||
+					 stack.get(stack.size() - 2).compareTo("$") == 0 && value.compareTo("}") != 0 )
 			System.out.print( value + ", ");
 		}
 		System.out.println();
 	}
+	
+	public boolean check_follow(String input) {
+		for(String value : follow) {
+			if(value.compareTo(input) == 0) {
+				return true;
+			}
+		}
+		return false;
+	} 
 	
 	public ArrayList<String> get_follow() {
 		return follow;

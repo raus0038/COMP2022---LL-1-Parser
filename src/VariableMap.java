@@ -107,7 +107,7 @@ public class VariableMap implements Constants {
 			
 			// If no such rule exists
 			if(rule == null) {
-				
+	
 					// Check if the current variable has a follow set ( "L", "R" ) 
 					if(current_variable.get_follow().isEmpty() != true) {
 						ArrayList<String> follow = current_variable.get_follow();
@@ -125,7 +125,9 @@ public class VariableMap implements Constants {
 							// 'err' is used to prevent repeated error statements from occurring
 							if(err == false) {
 								System.out.print(terminal + " was found but expected ");
-								current_variable.print_follow();
+								if(old_stack.size() > 1) {
+									current_variable.print_follow(old_stack);
+								}
 							}
 							old_stack = null;
 						}

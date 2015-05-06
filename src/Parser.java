@@ -100,17 +100,21 @@ public class Parser implements Constants {
 		public void parse() {
 			
 			boolean parse_end = false;
+			String scanned;
 			print_stacks();
 			/*
 			 * Main parsing loop
 			 */
 			while(parse_end == false) {
-
+				scanned = new String();
 				// Get next input token from input stack
-				String scanned = input.get(input.size() - 1);
+				if(input.size() > 0) {
+					 scanned = input.get(input.size() - 1);
+				}
 				
 				// get updated stack from scanned token and current variable on the rules stack
-			    rules = get_rule(scanned, rules.get(rules.size() - 1), rules);
+					rules = get_rule(scanned, rules.get(rules.size() - 1), rules);
+				
 			    
 			    // if error recovery is not on
 			    if(error_recovery == false) {
@@ -133,18 +137,18 @@ public class Parser implements Constants {
 			    // if error_recovery is turned on
 			    else {
 			    	
-			    	// if both stacks contain only the end of stack symbol, and no errors have occured during parsing
+			    	// if both stacks contain only the end of stack symbol, and no errors have occurred during parsing
 			    	// then input is valid
-			    	if(scanned.compareTo(rules.get(rules.size() - 1)) == 0 && scanned.compareTo("$") == 0 &&
-			    			rejected == false){
+			    	if(input.size() == 1 && rules.size() == 1 &&
+			    			rejected == false && error_count == 0){
 			    		parse_end = true;
 						System.out.println("ACCEPTED");
 						break;
 			    	}
 			    	// else if an error occurred during parsing, or either stack is of size 0 while the other is not
 			    	// input is invalid
-			    	else if (scanned.compareTo(rules.get(rules.size() - 1)) == 0 && scanned.compareTo("$") == 0 ||
-			    			(input.size() == 0 && rules.size() > 0) | 	(input.size() > 0 && rules.size() == 0) &&
+			    	else if (input.size() == 1 && rules.size() == 1 ||
+			    			(input.size() == 0 && rules.size() > 0) || 	(input.size() > 0 && rules.size() == 0) &&
 			    			rejected == true) {
 			    		System.out.println("REJECTED");
 			    		System.out.println("Number of errors: " + error_count);
@@ -161,15 +165,61 @@ public class Parser implements Constants {
 		 * Returns an updated rules stack from the given input token
 		 */
 		public Stack<String> get_rule(String terminal, String variable, Stack<String> prevRules) {
-			
 			Stack<String> temp_stack = variable_map.update_stack(variable, terminal, prevRules, error_found);
 			boolean input_popped = false;
 			if(error_recovery == true) {
 				// Error occurred for current input token
 				if(temp_stack == null) {
+
+					String input_pop = new String();
 					
 					if(error_found == false) {
 						error_count++;
+					}
+					
+					if(check_terminal(variable) == false && prevRules.size() > 1) {
+						boolean pop_rule = true;
+						int i = input.size() - 1;
+						int j = prevRules.size() - 1;
+						while(pop_rule == true && input.size() > 0) {
+							String input_token = input.get(i);
+							
+							if(input.size() > 0 && prevRules.size() > 0) {
+								for(Variable s : variable_map.get_variables()) {
+									String variable_token = prevRules.get(j);
+									if(check_terminal(variable_token) == true) {
+										if(variable_token.compareTo(input_token) == 0) {
+											for(int k = prevRules.size() - 1; k >= j + 1; k--) {
+												prevRules.pop();
+											}
+											return prevRules;
+										}
+									}
+									if(s.get_variable().compareTo(variable_token) == 0) {
+		
+										if(s.get_rule(input_token) != null) {
+											pop_rule = false;
+											break;
+										}
+									}
+									--j;
+									if(j == 0) {
+										break;
+									}
+								}
+							}
+							
+							if(pop_rule == true) {
+									
+								i--;
+								j = prevRules.size() - 1;
+								input.pop();
+							}
+						}
+						if(pop_rule)
+						prevRules.pop();
+						
+						return prevRules;
 					}
 
 					// If the current variable on the rules stack contains a follow set, or is null
@@ -178,18 +228,59 @@ public class Parser implements Constants {
 					for(Variable s : variable_map.get_variables()) {
 						if(s.get_follow().isEmpty() == false && s.get_variable().compareTo(variable) == 0
 								&& input.size() > 0) {
-							input.pop();
+							input_pop = input.pop();
+							prevRules.pop();
 							input_popped = true;
 							break;
 						}
 					}
 					
-					if(input_popped == false || variable.compareTo("$") == 0  && error_found == false) {
-						input.pop();
-						input_popped = true;
+					if(prevRules.size() >= 1) {
+						if(prevRules.get(prevRules.size() - 1).compareTo(input_pop) == 0) {
+							print_stacks();
+							input.pop();
+							input_popped = true;
+							prevRules.pop();
+						}
+						else if (check_terminal(prevRules.get(prevRules.size() - 1)) == false) {
+							for(Variable s : variable_map.get_variables()) {
+								if(s.get_variable().compareTo(prevRules.get(prevRules.size() - 1)) == 0 &&
+										s.check_follow(input_pop) == true) {
+									print_stacks();
+									prevRules.pop();
+									prevRules.pop();
+									break;
+								}
+							}
+							boolean stop_parsing = false;
+							while(prevRules.get(prevRules.size() - 1).compareTo(input.get(input.size() - 1)) != 0 &&
+									stop_parsing == false && prevRules.size() > 1 && input.size() > 1) {
+								
+								prevRules.pop();
+								for(Variable s : variable_map.get_variables()) {
+									if(s.get_variable().compareTo(prevRules.get(prevRules.size() - 1)) == 0 &&
+											s.check_follow(input_pop) == true) {
+										stop_parsing = true;
+										break;
+									}
+								}
+								if(stop_parsing == false) {
+									input.pop();
+									input_popped = true;
+								}
+							}
+						}
 					}
+					
+					if(input_popped == false || variable.compareTo("$") == 0  && error_found == false) {
+//						input_pop = input.pop();
+						prevRules.pop();
+						input_popped = true;
+				}
+	
 					error_found = true;
 					rejected = true;
+
 				}
 				else {
 					// no errors found
@@ -204,7 +295,8 @@ public class Parser implements Constants {
 			
 			// If the current variable on top of rules stack is a terminal
 			// pop the input stack
-			if( (check_terminal(variable) && input.size() > 0 && input_popped == false) || (error_found == true && input_popped == false) ) {
+			if( (check_terminal(variable) && input.size() > 0 && input_popped == false) || 
+					(error_found == true && input_popped == false) ) {
 				input.pop();
 			}
 			return prevRules;
