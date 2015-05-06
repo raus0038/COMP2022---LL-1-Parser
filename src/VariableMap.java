@@ -38,6 +38,10 @@ public class VariableMap implements Constants {
 		return null;
 	}
 	
+	public ArrayList<Variable> get_variables() {
+		return variable_list;
+	}
+	
 	/*
 	 * Helper functions used to reverse contents of a stack to allow for 
 	 * updated rules to be added to the top of the stack
