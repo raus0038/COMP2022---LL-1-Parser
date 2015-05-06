@@ -180,29 +180,40 @@ public class Parser implements Constants {
 				if (error_found == false) {
 					error_count++;
 				}
-
+				
+				// If the current variable is not a terminal character we proceed to do several 
+				// operations to determine how to recover from an error.
+				// For each token in the rules stack, compare it to each input token
+				// if there is a rule for the given variable and input token
+				// the input stack is popped, and if the current top input element is equivalent to the second
+				// element of the prevRules stack, we pop the prevRules stack again to ensure equal terminals
+				
 				if (check_terminal(variable) == false && prevRules.size() > 1) {
 
-					boolean pop_rule = true;
 					int i = input.size() - 1;
 					int j = prevRules.size() - 1;
-					while (pop_rule == true && input.size() > 0) {
+					
+					while (input.size() > 0) {
 
 						if (input.size() > 0 && prevRules.size() > 0) {
-
+							// We iterate through the variable list for comparisons
 							for (Variable s : variable_map.get_variables()) {
+								// This loop is responsible for iterating over the current rules stack
 								for (int l = j; l >= 0; l--) {
 									String variable_token = prevRules.get(l);
+									//This loop is responsible for iterating over the current input stack
 									for (int m = i; m >= 0; m--) {
 										String input_token = input.get(m);
+										
+										//  if current token is a variable
 										if (s.get_variable().compareTo(
 												variable_token) == 0) {
-
+											
+											//If there is no rule associated with token pop the input stack and check
+											//If the next token on the prevRules stack is equivalent, if so pop the prevRules
+											//stack
 											if (s.get_rule(input_token) != null) {
-												if (check_terminal(variable_token) == false
-														&& s.get_rule(input_token) == null) {
-													prevRules.pop();
-												}
+											
 												input.pop();
 												if (input.size() > 0) {
 													if (input
@@ -225,75 +236,17 @@ public class Parser implements Constants {
 						}
 					}
 				}
+				
 
-				// If the current variable on the rules stack contains a follow
-				// set, or is null
-				// pop the input stack to continue reading until valid token
-				// found
-
-				for (Variable s : variable_map.get_variables()) {
-					if (s.get_follow().isEmpty() == false
-							&& s.get_variable().compareTo(variable) == 0
-							&& input.size() > 0) {
-						input_pop = input.pop();
-						prevRules.pop();
-						input_popped = true;
-						break;
-					}
-				}
-
-				if (prevRules.size() >= 1) {
-					if (prevRules.get(prevRules.size() - 1)
-							.compareTo(input_pop) == 0) {
-						print_stacks();
-						input.pop();
-						input_popped = true;
-						prevRules.pop();
-					} else if (check_terminal(prevRules
-							.get(prevRules.size() - 1)) == false) {
-						for (Variable s : variable_map.get_variables()) {
-							if (s.get_variable().compareTo(
-									prevRules.get(prevRules.size() - 1)) == 0
-									&& s.check_follow(input_pop) == true) {
-								print_stacks();
-								prevRules.pop();
-								prevRules.pop();
-								break;
-							}
-						}
-						boolean stop_parsing = false;
-						while (prevRules.get(prevRules.size() - 1).compareTo(
-								input.get(input.size() - 1)) != 0
-								&& stop_parsing == false
-								&& prevRules.size() > 1 && input.size() > 1) {
-
-							prevRules.pop();
-							for (Variable s : variable_map.get_variables()) {
-								if (s.get_variable().compareTo(
-										prevRules.get(prevRules.size() - 1)) == 0
-										&& s.check_follow(input_pop) == true) {
-									stop_parsing = true;
-									break;
-								}
-							}
-							if (stop_parsing == false) {
-								input.pop();
-								input_popped = true;
-							}
-						}
-					}
-				}
-
+				// 
 				if (input_popped == false || variable.compareTo("$") == 0
 						&& error_found == false) {
-					// input_pop = input.pop();
 					prevRules.pop();
 					input_popped = true;
 				}
 
 				error_found = true;
 				rejected = true;
-
 			} else {
 				// no errors found
 				error_found = false;
