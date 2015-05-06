@@ -3,9 +3,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/*
+ * Variable class to hold information regarding each individual variable of the 
+ * LL(1) Grammar
+ */
 
 public class Variable {
 	
+	/*
+	 * Initialize Variables
+	 */
 	String variable;
 	ArrayList<String> rules;
 	HashMap<String, String> first;
@@ -14,11 +21,13 @@ public class Variable {
 	
 	public Variable(String variable_identifier) {
 		
+		// Set first and follow sets, the first set is a Hash Map as each valid symbol has a corresponding rule
 		first = new HashMap<String, String>();
 		follow = new ArrayList<String>();
 		
 		variable = variable_identifier;
 		
+		// Switch to define the first / follow sets for given variable
 		switch(variable) {
 		case "S":
 			  first.put("i", "EL");
@@ -80,12 +89,15 @@ public class Variable {
 		
 	}
 	
+	/*
+	 * Helper functions to return and display class information
+	 */
 	public String get_rule(String terminal) {
 		return first.get(terminal);
 	}
 	
 	public void print_rules() {
-		for(String value : first.values()) {
+		for(String value : first.keySet()) {
 			System.out.print( value + ", ");
 		}
 	}
