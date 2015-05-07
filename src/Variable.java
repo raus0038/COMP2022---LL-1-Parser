@@ -36,8 +36,6 @@ public class Variable {
 		case "L":
 			  first.put("x", "AL");
 			  first.put("y", "AL");
-			  follow.add("x");
-			  follow.add("y");
 			  follow.add("}");
 			  follow.add("$");
 			  break;

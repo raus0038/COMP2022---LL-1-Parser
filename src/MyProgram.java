@@ -1,3 +1,11 @@
+/*
+ * COMP2022 - Formal Languages and Logic Assignment 2
+ * 
+ * LL(1) Parser
+ * 
+ * @author Rhys Austin
+ * 
+ */
 
 public class MyProgram {
 

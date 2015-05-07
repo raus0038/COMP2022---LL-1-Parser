@@ -168,14 +168,15 @@ public class Parser implements Constants {
 	 */
 	public Stack<String> get_rule(String terminal, String variable,
 			Stack<String> prevRules) {
+		
 		Stack<String> temp_stack = variable_map.update_stack(variable,
 				terminal, prevRules, error_found);
+		
 		boolean input_popped = false;
+		
 		if (error_recovery == true) {
 			// Error occurred for current input token
 			if (temp_stack == null) {
-
-				String input_pop = new String();
 
 				if (error_found == false) {
 					error_count++;
@@ -216,12 +217,8 @@ public class Parser implements Constants {
 											
 												input.pop();
 												if (input.size() > 0) {
-													if (input
-															.get(input.size() - 1)
-															.compareTo(
-																	prevRules
-																			.get(prevRules
-																					.size() - 2)) == 0) {
+													if (input.get(input.size() - 1).compareTo
+															(prevRules.get(prevRules.size() - 2)) == 0) {
 														prevRules.pop();
 													}
 												}
@@ -236,9 +233,7 @@ public class Parser implements Constants {
 						}
 					}
 				}
-				
-
-				// 
+	
 				if (input_popped == false || variable.compareTo("$") == 0
 						&& error_found == false) {
 					prevRules.pop();
